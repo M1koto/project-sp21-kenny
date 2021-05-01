@@ -12,7 +12,7 @@ def is_valid_solution(G, c, k):
     """
     size = len(G)
     H = G.copy()
-
+    #print(c)
     for road in k:
         assert H.has_edge(road[0], road[1]), "Invalid Solution: {} is not a valid edge in graph G".format(road)
     H.remove_edges_from(k)

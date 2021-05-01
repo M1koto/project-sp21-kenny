@@ -20,17 +20,17 @@ def solve(G):
     c_ret = remove_c(use, c, V)
     print(c_ret)
     k_ret = dijkstra_remove_k(use, k, V)
-    print(c_ret)
     print(k_ret)
     return (c_ret, k_ret)
 
-
+# remove nodes by considering all graphs after removal for all nodes
 def remove_c(G, c, V):
     ret = []
     nodes = list(G.nodes())
     nodes.remove(0)
     nodes.remove(V-1)
-    for i in range(c):
+    #ret has node
+    while len(ret) < c:
         temp = -1
         curr = -1
         for j in nodes:
@@ -42,29 +42,31 @@ def remove_c(G, c, V):
                     temp = j
                     curr = score
         nodes.remove(temp)
-        ret.append(temp)
-    for k in ret:
-    	G.remove_node(k)
+        if is_valid_solution(G, ret+[temp], []):
+        	ret.append(temp)
+    for x in ret:
+    	G.remove_node(x)
     return ret
 
-
+# removes k edges from shortest path, computing shortest path each time
 def dijkstra_remove_k(G, k, V):
     ret = []
     for i in range(k):
         shortest = nx.dijkstra_path(G, 0, V - 1)
-        pos = max_weight_edge(shortest, G, [])
+        #print(shortest)
+        pos = max_weight_edge(shortest, G)
         if pos != -1:
             ret.append([shortest[pos], shortest[pos + 1]])
             G.remove_edge(shortest[pos], shortest[pos + 1])
         else:
             return ret
     return ret
+# return true if removing any edge in s is possible
 def dijkstra_possible(G, s):
-	for i in range(len(s)-1):
-		H = G.copy()
-		H.remove_edge(s[i], s[i+1])
-		if nx.is_connected(H):
-			return True
+	H = G.copy()
+	H.remove_edge(s[0], s[1])
+	if nx.is_connected(H):
+		return True
 	return False
 def get_kc(n):
     if n <= 30:
@@ -76,7 +78,7 @@ def get_kc(n):
 
 
 # Returns maximum edge on shortest path s to t, -1 IF NOT POSSIBLE
-def max_weight_edge(p, G, no):
+def max_weight_edge(p, G):
     ret = -1
     curr = -1
     for i in range(len(p) - 1):
@@ -87,16 +89,16 @@ def max_weight_edge(p, G, no):
     return ret
 
 
-'''if __name__ == '__main__':
+if __name__ == '__main__':
      assert len(sys.argv) == 2
      path = sys.argv[1]
      G = read_input_file(path)
      c, k = solve(G)
      assert is_valid_solution(G, c, k)
      print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-     write_output_file(G, c, k, 'outputs/ttest.out')'''
+     write_output_file(G, c, k, 'outputs/ttest.out')
 
-if __name__ == '__main__':
+'''if __name__ == '__main__':
      inputs = glob.glob('inputs/medium/*')
      for input_path in inputs:
          print(input_path)
@@ -105,7 +107,7 @@ if __name__ == '__main__':
          c, k = solve(G)
          assert is_valid_solution(G, c, k)
          distance = calculate_score(G, c, k)
-         write_output_file(G, c, k, output_path)
+         write_output_file(G, c, k, output_path)'''
 
 
 # Here's an example of how to run your solver.
