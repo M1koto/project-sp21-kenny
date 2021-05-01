@@ -14,11 +14,12 @@ def solve(G):
         c: list of cities to remove
         k: list of edges to remove
     """
+    use = G.copy()
     V = len(G)
     (k, c) = get_kc(V)
-    c_ret = remove_c(G, c, V)
+    c_ret = remove_c(use, c, V)
     print(c_ret)
-    k_ret = dijkstra_remove_k(G, k, V)
+    k_ret = dijkstra_remove_k(use, k, V)
     print(c_ret)
     print(k_ret)
     return (c_ret, k_ret)
@@ -30,8 +31,8 @@ def remove_c(G, c, V):
     nodes.remove(0)
     nodes.remove(V-1)
     for i in range(c):
-        temp = 0
-        curr = 0
+        temp = -1
+        curr = -1
         for j in nodes:
             H = G.copy()
             H.remove_node(j)
@@ -40,8 +41,10 @@ def remove_c(G, c, V):
                 if score > curr:
                     temp = j
                     curr = score
-        G.remove_node(temp)
+        nodes.remove(temp)
         ret.append(temp)
+    for k in ret:
+    	G.remove_node(k)
     return ret
 
 
@@ -49,21 +52,20 @@ def dijkstra_remove_k(G, k, V):
     ret = []
     for i in range(k):
         shortest = nx.dijkstra_path(G, 0, V - 1)
-        removed = False
-        while removed is False:
-        	dame = []
-        	pos = max_weight_edge(shortest, G, dame)
-        	H = G.copy()
-        	H.remove_edge(shortest[pos], shortest[pos + 1])
-        	if nx.is_connected(H):
-        		ret.append([shortest[pos], shortest[pos + 1]])
-        		G.remove_edge(shortest[pos], shortest[pos + 1])
-        		removed = True
-        	else:
-        		dame = [pos]
+        pos = max_weight_edge(shortest, G, [])
+        if pos != -1:
+            ret.append([shortest[pos], shortest[pos + 1]])
+            G.remove_edge(shortest[pos], shortest[pos + 1])
+        else:
+            return ret
     return ret
-
-
+def dijkstra_possible(G, s):
+	for i in range(len(s)-1):
+		H = G.copy()
+		H.remove_edge(s[i], s[i+1])
+		if nx.is_connected(H):
+			return True
+	return False
 def get_kc(n):
     if n <= 30:
         return (15, 1)
@@ -73,28 +75,37 @@ def get_kc(n):
         return (100, 5)
 
 
+# Returns maximum edge on shortest path s to t, -1 IF NOT POSSIBLE
 def max_weight_edge(p, G, no):
-    ret = 0
-    curr = 0
-    print(p)
-    if len(no) != 0:
-        p = p[:no[0]]
+    ret = -1
+    curr = -1
     for i in range(len(p) - 1):
-        temp = G[p[i]][p[i] + 1]['weight']
-        if temp > curr:
+        temp = G[p[i]][p[i+1]]['weight']
+        if dijkstra_possible(G, [p[i], p[i+1]]) and temp > curr:
             curr = temp
             ret = i
     return ret
 
 
-if __name__ == '__main__':
+'''if __name__ == '__main__':
      assert len(sys.argv) == 2
      path = sys.argv[1]
      G = read_input_file(path)
      c, k = solve(G)
      assert is_valid_solution(G, c, k)
      print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-     write_output_file(G, c, k, 'outputs/ttest.out')
+     write_output_file(G, c, k, 'outputs/ttest.out')'''
+
+if __name__ == '__main__':
+     inputs = glob.glob('inputs/medium/*')
+     for input_path in inputs:
+         print(input_path)
+         output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
+         G = read_input_file(input_path)
+         c, k = solve(G)
+         assert is_valid_solution(G, c, k)
+         distance = calculate_score(G, c, k)
+         write_output_file(G, c, k, output_path)
 
 
 # Here's an example of how to run your solver.
