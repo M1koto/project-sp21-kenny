@@ -18,9 +18,9 @@ def solve(G):
     V = len(G)
     (k, c) = get_kc(V)
     c_ret = remove_c(use, c, V)
-    print(c_ret)
+    for i in c_ret:
+    	use.remove_node(i)
     k_ret = dijkstra_remove_k(use, k, V)
-    print(k_ret)
     return (c_ret, k_ret)
 
 # remove nodes by considering all graphs after removal for all nodes
@@ -41,11 +41,12 @@ def remove_c(G, c, V):
                 if score > curr:
                     temp = j
                     curr = score
+        if len(nodes) == 0 or temp == -1:
+        	return ret
+        #print(temp)
         nodes.remove(temp)
         if is_valid_solution(G, ret+[temp], []):
         	ret.append(temp)
-    for x in ret:
-    	G.remove_node(x)
     return ret
 
 # removes k edges from shortest path, computing shortest path each time
@@ -89,17 +90,17 @@ def max_weight_edge(p, G):
     return ret
 
 
-if __name__ == '__main__':
+'''if __name__ == '__main__':
      assert len(sys.argv) == 2
      path = sys.argv[1]
      G = read_input_file(path)
      c, k = solve(G)
      assert is_valid_solution(G, c, k)
      print("Shortest Path Difference: {}".format(calculate_score(G, c, k)))
-     write_output_file(G, c, k, 'outputs/ttest.out')
+     write_output_file(G, c, k, 'outputs/ttest.out')'''
 
-'''if __name__ == '__main__':
-     inputs = glob.glob('inputs/medium/*')
+if __name__ == '__main__':
+     inputs = glob.glob('inputs/large/*')
      for input_path in inputs:
          print(input_path)
          output_path = 'outputs/' + basename(normpath(input_path))[:-3] + '.out'
@@ -107,8 +108,7 @@ if __name__ == '__main__':
          c, k = solve(G)
          assert is_valid_solution(G, c, k)
          distance = calculate_score(G, c, k)
-         write_output_file(G, c, k, output_path)'''
-
+         write_output_file(G, c, k, output_path)
 
 # Here's an example of how to run your solver.
 
