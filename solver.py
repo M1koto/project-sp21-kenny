@@ -55,7 +55,7 @@ def dijkstra_remove_k(G, k, V):
     for i in range(k):
         shortest = nx.dijkstra_path(G, 0, V - 1)
         #print(shortest)
-        pos = max_weight_edge(shortest, G)
+        pos = min_weight_edge(shortest, G)
         if pos != -1:
             ret.append([shortest[pos], shortest[pos + 1]])
             G.remove_edge(shortest[pos], shortest[pos + 1])
@@ -79,12 +79,12 @@ def get_kc(n):
 
 
 # Returns maximum edge on shortest path s to t, -1 IF NOT POSSIBLE
-def max_weight_edge(p, G):
+def min_weight_edge(p, G):
     ret = -1
-    curr = -1
+    curr = 1000
     for i in range(len(p) - 1):
         temp = G[p[i]][p[i+1]]['weight']
-        if dijkstra_possible(G, [p[i], p[i+1]]) and temp > curr:
+        if dijkstra_possible(G, [p[i], p[i+1]]) and temp < curr:
             curr = temp
             ret = i
     return ret

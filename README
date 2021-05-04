@@ -1,0 +1,1 @@
+In the if clause at the bottom, change 'inputs/{size}/*' the path of the input file to compute.
